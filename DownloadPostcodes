@@ -1,0 +1,37 @@
+Sub DownloadPostcodes()
+'Reference Microsoft Internet Controls
+
+Dim AllCodes As Variant
+Dim myURL As String
+AllCodes = Array("AB", "AL", "B", "BA", "BB", "BD", "BF", "BH", "BL", "BN", "BR", "BS", "BT", "BX", "CA", "CB", "CF", "CH", "CM", "CO", "CR", "CT", "CV", "CW", "DA", "DD", "DE", "DG", "DH", "DL", "DN", "DT", "DY", "E", "EC", "EH", "EN", "EX", "FK", "FY", "G", "GL", "GU", "GY", "HA", "HD", "HG", "HP", "HR", "HS", "HU", "HX", "IG", "IM", "IP", "IV", "JE", "KA", "KT", "KW", "KY", "L", "LA", "LD", "LE", "LL", "LN", "LS", "LU", "M", "ME", "MK", "ML", "N", "NE", "NG", "NN", "NP", "NR", "NW", "OL", "OX", "PA", "PE", "PH", "PL", "PO", "PR", "RG", "RH", "RM", "S", "SA", "SE", "SG", "SK", "SL", "SM", "SN", "SO", "SP", "SR", "SS", "ST", "SW", "SY", "TA", "TD", "TF", "TN", "TQ", "TR", "TS", "TW", "UB", "W", "WA", "WC", "WD", "WF", "WN", "WR", "WS", "WV", "YO", "ZE")
+Dim DestFolder As String
+DestFolder = ("C:\postcodes\") 'Define where to save to
+
+'Checks if Destination Folder exists, and creates it if it doesn't
+If Len(Dir(DestFolder)) = 0 Then
+    MkDir (DestFolder)
+End If
+
+'Dowloads all KML files to Destination folder
+For Each Area In AllCodes
+    myURL = "https://en.wikipedia.org/w/index.php?title=Template:Attached_KML/" & Area & "_postcode_area&action=raw"
+    Dim SaveFile As String
+    SaveFile = DestFolder & Area & ".kml"
+    
+    Dim WinHttpReq As Object
+    Set WinHttpReq = CreateObject("Microsoft.XMLHTTP")
+    WinHttpReq.Open "GET", myURL, False
+    WinHttpReq.send
+
+    myURL = WinHttpReq.responseBody
+    If WinHttpReq.Status = 200 Then
+        Set oStream = CreateObject("ADODB.Stream")
+        oStream.Open
+        oStream.Type = 1
+        oStream.Write WinHttpReq.responseBody
+        oStream.SaveToFile (SaveFile)
+        oStream.Close
+End If
+Next
+
+End Sub
