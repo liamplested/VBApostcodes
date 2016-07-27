@@ -1,0 +1,44 @@
+Sub PostcodesCollate()
+
+'Makes program run in background, and handles errors
+Application.ScreenUpdating = False
+Application.DisplayAlerts = False
+On Error GoTo ErrorHandling
+
+Dim AllCodes As Variant
+Dim StrFile As String
+Dim SourceFolder As String
+SourceFolder = ("C:\postcodes\") ' Defines where the files are kept
+
+AllCodes = Array("AB", "AL", "B", "BA", "BB", "BD", "BF", "BH", "BL", "BN", "BR", "BS", "BT", "BX", "CA", "CB", "CF", "CH", "CM", "CO", "CR", "CT", "CV", "CW", "DA", "DD", "DE", "DG", "DH", "DL", "DN", "DT", "DY", "E", "EC", "EH", "EN", "EX", "FK", "FY", "G", "GL", "GU", "GY", "HA", "HD", "HG", "HP", "HR", "HS", "HU", "HX", "IG", "IM", "IP", "IV", "JE", "KA", "KT", "KW", "KY", "L", "LA", "LD", "LE", "LL", "LN", "LS", "LU", "M", "ME", "MK", "ML", "N", "NE", "NG", "NN", "NP", "NR", "NW", "OL", "OX", "PA", "PE", "PH", "PL", "PO", "PR", "RG", "RH", "RM", "S", "SA", "SE", "SG", "SK", "SL", "SM", "SN", "SO", "SP", "SR", "SS", "ST", "SW", "SY", "TA", "TD", "TF", "TN", "TQ", "TR", "TS", "TW", "UB", "W", "WA", "WC", "WD", "WF", "WN", "WR", "WS", "WV", "YO", "ZE")
+
+For Each Area In AllCodes
+    On Error GoTo ErrorHandling
+    StrFile = SourceFolder & Area & ".kml"
+    Dim xSource As Workbook
+    Dim yDest As Workbook
+    Dim NextRow As Long
+    Set xSource = Workbooks.OpenXML(Filename:=StrFile, LoadOption:=xlXmlLoadImportToList) 'Opens KML file
+    
+    Set yDest = Workbooks.Open("C:\postcodes\All.xlsx") 'Defines the file we will be saving to (the destination)
+    NextRow = yDest.Sheets("Sheet1").Cells(Rows.Count, 2).End(xlUp).Row + 1 'Finds the next empty Row in the destination file
+
+    xSource.Sheets(Area).UsedRange.Copy 'Copies all data from KML file
+    Range("A" & NextRow).PasteSpecial 'Pastes all data at next row in destination file
+    xSource.Close
+    yDest.Save
+    yDest.Close
+Next
+
+'Turns off background operating
+Application.ScreenUpdating = True
+Application.DisplayAlerts = True
+
+'Error Handling
+ErrorHandling:
+Application.ScreenUpdating = True
+Application.DisplayAlerts = True
+MsgBox ("Error")
+
+End Sub
+
